@@ -33,7 +33,7 @@ void main(void)
 
 	if (nErr != 0)
 	{//初期化に失敗した場合(※エラーメッセージを表示して終了)
-
+		printf("\n 初期化失敗");
 	}
 
 	/* 3.ソケット作成 */
@@ -43,7 +43,7 @@ void main(void)
 
 	if (sock == INVALID_SOCKET)
 	{//エラーメッセージを表示して終了
-
+		printf("\n error");
 	}
 
 	/* 4.接続先の準備 */
@@ -59,7 +59,7 @@ void main(void)
 	//connect関数：サーバーに接続する
 	if (connect(sock, (struct sockaddr*)&addr, sizeof(addr)) != 0)
 	{//エラーメッセージを表示して終了
-		
+		printf("\n error");
 	}
 
 	/* 6.データの送受信 */
@@ -77,4 +77,10 @@ void main(void)
 	/* 8.Winsock終了処理 */
 
 	WSACleanup();	//WSACleanup関数：winsockの終了処理
+
+	printf("[ 受け取った値 : %d ]",nData);
+
+	//Enter入力待ち
+	rewind(stdin);
+	getchar();
 }
