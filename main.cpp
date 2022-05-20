@@ -62,6 +62,20 @@ void main(void)
 		printf("\n error");
 	}
 
+	/* 入力して送る */
+
+	//変数
+	int nSendData = 0;
+	char aData[MAX_DATA];
+
+	//入力を促す
+	printf("\n 値を入力 > ");
+	scanf("%d", &nSendData);
+
+	//値を送る
+	memcpy(&aData[0], &nSendData, sizeof(int));
+	send(sock, &aData[0], sizeof(int), 0);		//send関数：データを送信する
+
 	/* 6.データの送受信 */
 
 	char aRecvData[MAX_DATA] = {};
