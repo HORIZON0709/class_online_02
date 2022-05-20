@@ -69,6 +69,14 @@ void main(void)
 	int nData = 0;
 	memcpy(&nData, &aRecvData[0], sizeof(int));
 
+	//値の表示
+	printf("\n [ 受け取った値 : %d ]", nData);
+
+	//Enter入力待ち
+	printf("\n Press Enter");
+	rewind(stdin);
+	getchar();
+
 	/* 7.接続を切断する */
 
 	//サーバーとの接続を閉じる
@@ -77,11 +85,4 @@ void main(void)
 	/* 8.Winsock終了処理 */
 
 	WSACleanup();	//WSACleanup関数：winsockの終了処理
-
-	printf("[ 受け取った値 : %d ]",nData);
-
-	//Enter入力待ち
-	printf("\n Press Enter");
-	rewind(stdin);
-	getchar();
 }
