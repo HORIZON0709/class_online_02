@@ -73,7 +73,7 @@ void main(void)
 	printf("\n [ Žó‚¯Žæ‚Á‚½’l : %d ]", nData);
 
 	//Enter“ü—Í‘Ò‚¿
-	printf("\n Press Enter");
+	printf("\n\n Press Enter");
 	rewind(stdin);
 	getchar();
 
