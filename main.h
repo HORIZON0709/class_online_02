@@ -11,11 +11,9 @@
 //1.ライブラリを使用する宣言を追加
 //*******************************
 #define _WINSOCK_DEPRECATED_NO_WARNINGS
-//[構成プロパティ]→[C++]→[プリプロセッサ]→[プリプロセッサの定義]に追加してもOK
 
 #include <winsock2.h>
 
 #pragma comment(lib,"ws2_32.lib")
-//[構成プロパティ]→[リンカ―]→[入力]→[追加の依存ファイル]に追加してもOK
 
 #endif
