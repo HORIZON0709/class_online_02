@@ -12,6 +12,7 @@
 
 #include <stdio.h>
 #include <string.h>
+#include <stdlib.h>
 
 //*******************************
 //定数の定義
@@ -19,6 +20,14 @@
 namespace
 {
 const int MAX_DATA = 4;		//データの最大数
+}//namespaceはここまで
+
+//*******************************
+//プロトタイプ宣言
+//*******************************
+namespace
+{
+void Title();
 }//namespaceはここまで
 
 //=================================================
@@ -62,29 +71,52 @@ void main(void)
 		printf("\n error");
 	}
 
-	/* 入力して送る */
+	/* 解答を受け取る */
+
+	char aRecvAnswer[MAX_DATA] = {};
+	int nRecvByte = recv(sock, &aRecvAnswer[0], sizeof(aRecvAnswer), 0);	//recv関数：データを受信する
+	int nAnswer = 0;
+	memcpy(&nAnswer, &aRecvAnswer[0], sizeof(int));
+
+	Title();	//見出し表示
+
+	/* 入力 */
 
 	//変数
-	int nSendData = 0;
-	char aData[MAX_DATA];
-
-	//入力を促す
-	printf("\n 値を入力 > ");
-	scanf("%d", &nSendData);
-
-	//値を送る
-	memcpy(&aData[0], &nSendData, sizeof(int));
-	send(sock, &aData[0], sizeof(int), 0);		//send関数：データを送信する
-
-	/* 6.データの送受信 */
-
-	char aRecvData[MAX_DATA] = {};
-	int nRecvByte = recv(sock, &aRecvData[0], sizeof(aRecvData), 0);	//recv関数：データを受信する
 	int nData = 0;
-	memcpy(&nData, &aRecvData[0], sizeof(int));
+	
+	while (1)
+	{
+		//入力を促す
+		printf("\n 値を入力 > ");
+		scanf("%d", &nData);
 
-	//値の表示
-	printf("\n [ 受け取った値 : %d ]", nData);
+		if (nData == nAnswer)
+		{//正解と一致
+			printf("\n\n 正解!!!");
+			break;
+		}
+
+		/* 不正解の場合 */
+
+		if (nData >= (nAnswer - 20))
+		{//正解から[20以上小さい]
+			printf("\n もっと小さいぞぉ～");
+		}
+		else if (nData <= (nAnswer + 20))
+		{//正解から[20以上大きい]
+			printf("\n もっと大きいぞぉ～");
+		}
+		else if (nData >= (nAnswer - 10))
+		{//正解から[10以上小さい]
+			printf("\n もう少し小さいぞぉ～");
+		}
+		else if (nData <= (nAnswer + 10))
+		{//正解から[10以上大きい]
+			printf("\n もう少し大きいぞぉ～");
+		}
+		
+	}
 
 	//Enter入力待ち
 	printf("\n\n Press Enter");
@@ -99,4 +131,16 @@ void main(void)
 	/* 8.Winsock終了処理 */
 
 	WSACleanup();	//WSACleanup関数：winsockの終了処理
+}
+
+namespace
+{
+//-------------------------------------------------
+//見出し
+//-------------------------------------------------
+void Title()
+{
+	printf("\n [ ☆ オンライン数字当てゲーム ☆ ]");
+	printf("\n 1～100の数字を入力してね！");
+}
 }
