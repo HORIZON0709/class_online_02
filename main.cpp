@@ -87,6 +87,13 @@ void main(void)
 		char aRecvAnswer[MAX_DATA] = {};
 		int nRecvByte = recv(sock, &aRecvAnswer[0], sizeof(aRecvAnswer), 0);	//データを受信する
 		
+		if (nRecvByte <= 0)
+		{//接続が切断されたら
+			closesocket(sock);		//ソケットのクローズ処理を行う
+
+			/* ※これ以降、送受信はできない */
+		}
+
 		//表示
 		printf("\n [ %s ]", &aRecvAnswer[0]);
 
