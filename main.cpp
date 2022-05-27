@@ -1,6 +1,6 @@
 //=================================================
 //
-//オンライン利用技術その2[main.cpp]
+//オンライン利用技術～クライアント側～[main.cpp]
 //Author:KishimotoEiji
 //
 //=================================================
@@ -19,9 +19,7 @@
 //*******************************
 namespace
 {
-const int MAX_DATA = 4;			//データの最大数
-const int SMALL_ERROR = 10;		//小さい誤差
-const int LARGE_ERROR = 30;		//大きい誤差
+const int MAX_DATA = 256;			//データの最大数
 }//namespaceはここまで
 
 //*******************************
@@ -29,7 +27,6 @@ const int LARGE_ERROR = 30;		//大きい誤差
 //*******************************
 namespace
 {
-void Title();
 void PressEnter();
 }//namespaceはここまで
 
@@ -41,7 +38,7 @@ void main(void)
 	/* 2.Winsockの初期化関数を実行する */
 
 	WSADATA wsaData;
-	int nErr = WSAStartup(WINSOCK_VERSION, &wsaData);	//WSAStartup関数：winsockの初期化処理
+	int nErr = WSAStartup(WINSOCK_VERSION, &wsaData);	//winsockの初期化処理
 
 	if (nErr != 0)
 	{//初期化に失敗した場合(※エラーメッセージを表示して終了)
@@ -51,7 +48,7 @@ void main(void)
 	/* 3.ソケット作成 */
 
 	SOCKET sock;
-	sock = socket(AF_INET, SOCK_STREAM, 0);	//socket関数：ソケットを作成する。接続受付用のソケット作成
+	sock = socket(AF_INET, SOCK_STREAM, 0);	//ソケットを作成する。接続受付用のソケット作成
 
 	if (sock == INVALID_SOCKET)
 	{//エラーメッセージを表示して終了
@@ -68,92 +65,32 @@ void main(void)
 
 	/* 5.接続する */
 
-	//connect関数：サーバーに接続する
+	//サーバーに接続する
 	if (connect(sock, (struct sockaddr*)&addr, sizeof(addr)) != 0)
 	{//エラーメッセージを表示して終了
 		printf("\n error");
 	}
 
-	/* 解答を受け取る */
-
-	char aRecvAnswer[MAX_DATA] = {};
-	int nRecvByte = recv(sock, &aRecvAnswer[0], sizeof(aRecvAnswer), 0);	//recv関数：データを受信する
-	int nAnswer = 0;
-	memcpy(&nAnswer, &aRecvAnswer[0], sizeof(int));
-
-	//エンディアン変換(netowork to host)
-	nAnswer = ntohl(nAnswer);
-
 	/* 入力 */
 
 	//変数
-	int nData = 0;
+	char aData[MAX_DATA] = {};
 	
 	while (1)
 	{
-		Title();	//見出し表示
-
 		//入力を促す
 		printf("\n 値を入力 > ");
-		scanf("%d", &nData);
+		scanf("%s", &aData[0]);
 
-		if (nData == nAnswer)
-		{//正解と一致
-			printf("\n\n 正解!!!");
+		//送信
+		send(sock, &aData[0], strlen(&aData[0]) + 1, 0);
 
-			//Enter入力待ち
-			PressEnter();
-
-			//画面をクリア
-			system("cls");
-			break;
-		}
-
-		/* 不正解の場合 */
-
-		if ((nData >= (nAnswer - SMALL_ERROR)) && (nData <= (nAnswer + SMALL_ERROR)))
-		{//正解から[±10]
-			if ((nData >= (nAnswer - SMALL_ERROR)) && (nData <= nAnswer))
-			{//[ - ]
-				printf(" もう少し大きいぞぉ～\n");
-			}
-			else if ((nData >= nAnswer) && (nData <= (nAnswer + SMALL_ERROR)))
-			{//[ + ]
-				printf(" もう少し小さいぞぉ～\n");
-			}
-
-			//Enter入力待ち
-			PressEnter();
-
-			//画面をクリア
-			system("cls");
-
-			continue;	//入力へ戻る
-		}
-
-		if ((nData >= (nAnswer - LARGE_ERROR)) && (nData <= (nAnswer + LARGE_ERROR)))
-		{//正解から[±30]
-			if ((nData >= (nAnswer - LARGE_ERROR)) && (nData <= nAnswer))
-			{//[ - ]
-				printf(" もっと大きいぞぉ～\n");
-			}
-			else if ((nData >= nAnswer) && (nData <= (nAnswer + LARGE_ERROR)))
-			{//[ + ]
-				printf(" もっと小さいぞぉ～\n");
-			}
-
-			//Enter入力待ち
-			PressEnter();
-
-			//画面をクリア
-			system("cls");
-
-			continue;	//入力へ戻る
-		}
-
-		/* それ以上の誤差の場合 */
-
-		printf(" じぇーんじぇん違うわよぉ～\n");
+		//解答を受信
+		char aRecvAnswer[MAX_DATA] = {};
+		int nRecvByte = recv(sock, &aRecvAnswer[0], sizeof(aRecvAnswer), 0);	//データを受信する
+		
+		//表示
+		printf("\n [ %s ]", &aRecvAnswer[0]);
 
 		//Enter入力待ち
 		PressEnter();
@@ -173,20 +110,11 @@ void main(void)
 
 	/* 8.Winsock終了処理 */
 
-	WSACleanup();	//WSACleanup関数：winsockの終了処理
+	WSACleanup();	//winsockの終了処理
 }
 
 namespace
 {
-//-------------------------------------------------
-//見出し
-//-------------------------------------------------
-void Title()
-{
-	printf("\n [ ☆ オンライン数字当てゲーム ☆ ]");
-	printf("\n 1～100の数字を入力してね！");
-}
-
 //-------------------------------------------------
 //Enter入力待ち
 //-------------------------------------------------
