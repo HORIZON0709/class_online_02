@@ -19,7 +19,7 @@
 //*******************************
 namespace
 {
-const int MAX_DATA = 256;			//データの最大数
+const int MAX_DATA = 256;	//データの最大数
 }//namespaceはここまで
 
 //*******************************
@@ -71,15 +71,13 @@ void main(void)
 		printf("\n error");
 	}
 
-	/* 入力 */
-
-	//変数
-	char aData[MAX_DATA] = {};
-	
 	while (1)
 	{
+		//入力用配列
+		char aData[MAX_DATA] = {};
+
 		//入力を促す
-		printf("\n 値を入力 > ");
+		printf("\n 質問を入力 > ");
 		scanf("%s", &aData[0]);
 
 		//送信
