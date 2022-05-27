@@ -19,7 +19,9 @@
 //*******************************
 namespace
 {
-const int MAX_DATA = 4;		//データの最大数
+const int MAX_DATA = 4;			//データの最大数
+const int SMALL_ERROR = 10;		//小さい誤差
+const int LARGE_ERROR = 30;		//大きい誤差
 }//namespaceはここまで
 
 //*******************************
@@ -28,6 +30,7 @@ const int MAX_DATA = 4;		//データの最大数
 namespace
 {
 void Title();
+void PressEnter();
 }//namespaceはここまで
 
 //=================================================
@@ -78,7 +81,8 @@ void main(void)
 	int nAnswer = 0;
 	memcpy(&nAnswer, &aRecvAnswer[0], sizeof(int));
 
-	Title();	//見出し表示
+	//エンディアン変換(netowork to host)
+	nAnswer = ntohl(nAnswer);
 
 	/* 入力 */
 
@@ -87,6 +91,8 @@ void main(void)
 	
 	while (1)
 	{
+		Title();	//見出し表示
+
 		//入力を促す
 		printf("\n 値を入力 > ");
 		scanf("%d", &nData);
@@ -94,34 +100,71 @@ void main(void)
 		if (nData == nAnswer)
 		{//正解と一致
 			printf("\n\n 正解!!!");
+
+			//Enter入力待ち
+			PressEnter();
+
+			//画面をクリア
+			system("cls");
 			break;
 		}
 
 		/* 不正解の場合 */
 
-		if (nData >= (nAnswer - 20))
-		{//正解から[20以上小さい]
-			printf("\n もっと小さいぞぉ～");
+		if ((nData >= (nAnswer - SMALL_ERROR)) && (nData <= (nAnswer + SMALL_ERROR)))
+		{//正解から[±10]
+			if ((nData >= (nAnswer - SMALL_ERROR)) && (nData <= nAnswer))
+			{//[ - ]
+				printf(" もう少し大きいぞぉ～\n");
+			}
+			else if ((nData >= nAnswer) && (nData <= (nAnswer + SMALL_ERROR)))
+			{//[ + ]
+				printf(" もう少し小さいぞぉ～\n");
+			}
+
+			//Enter入力待ち
+			PressEnter();
+
+			//画面をクリア
+			system("cls");
+
+			continue;	//入力へ戻る
 		}
-		else if (nData <= (nAnswer + 20))
-		{//正解から[20以上大きい]
-			printf("\n もっと大きいぞぉ～");
+
+		if ((nData >= (nAnswer - LARGE_ERROR)) && (nData <= (nAnswer + LARGE_ERROR)))
+		{//正解から[±30]
+			if ((nData >= (nAnswer - LARGE_ERROR)) && (nData <= nAnswer))
+			{//[ - ]
+				printf(" もっと大きいぞぉ～\n");
+			}
+			else if ((nData >= nAnswer) && (nData <= (nAnswer + LARGE_ERROR)))
+			{//[ + ]
+				printf(" もっと小さいぞぉ～\n");
+			}
+
+			//Enter入力待ち
+			PressEnter();
+
+			//画面をクリア
+			system("cls");
+
+			continue;	//入力へ戻る
 		}
-		else if (nData >= (nAnswer - 10))
-		{//正解から[10以上小さい]
-			printf("\n もう少し小さいぞぉ～");
-		}
-		else if (nData <= (nAnswer + 10))
-		{//正解から[10以上大きい]
-			printf("\n もう少し大きいぞぉ～");
-		}
-		
+
+		/* それ以上の誤差の場合 */
+
+		printf(" じぇーんじぇん違うわよぉ～\n");
+
+		//Enter入力待ち
+		PressEnter();
+
+		//画面をクリア
+		system("cls");
 	}
 
-	//Enter入力待ち
-	printf("\n\n Press Enter");
-	rewind(stdin);
-	getchar();
+	//メッセージ & Enter入力待ち
+	printf("\n プログラムを終了します。お疲れさまでした。");
+	PressEnter();
 
 	/* 7.接続を切断する */
 
@@ -142,5 +185,15 @@ void Title()
 {
 	printf("\n [ ☆ オンライン数字当てゲーム ☆ ]");
 	printf("\n 1～100の数字を入力してね！");
+}
+
+//-------------------------------------------------
+//Enter入力待ち
+//-------------------------------------------------
+void PressEnter()
+{
+	printf("\n\n Press Enter");
+	rewind(stdin);
+	getchar();
 }
 }
