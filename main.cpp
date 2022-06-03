@@ -35,7 +35,9 @@ void PressEnter();
 //=================================================
 void main(void)
 {
-	/* 2.Winsockの初期化関数を実行する */
+	/*
+		2.Winsockの初期化関数を実行する
+	*/
 
 	WSADATA wsaData;
 	int nErr = WSAStartup(WINSOCK_VERSION, &wsaData);	//winsockの初期化処理
@@ -45,7 +47,9 @@ void main(void)
 		printf("\n 初期化失敗");
 	}
 
-	/* 3.ソケット作成 */
+	/*
+		3.ソケット作成
+	*/
 
 	SOCKET sock;
 	sock = socket(AF_INET, SOCK_STREAM, 0);	//ソケットを作成する。接続受付用のソケット作成
@@ -55,7 +59,9 @@ void main(void)
 		printf("\n error");
 	}
 
-	/* 4.接続先の準備 */
+	/*
+		4.接続先の準備
+	*/
 
 	const char* pIPAddress = "127.0.0.1";
 	struct sockaddr_in addr;
@@ -63,7 +69,9 @@ void main(void)
 	addr.sin_port = htons(22333);
 	addr.sin_addr.S_un.S_addr = inet_addr(pIPAddress);
 
-	/* 5.接続する */
+	/*
+		5.接続する
+	*/
 
 	//サーバーに接続する
 	if (connect(sock, (struct sockaddr*)&addr, sizeof(addr)) != 0)
@@ -77,8 +85,15 @@ void main(void)
 		char aData[MAX_DATA] = {};
 
 		//入力を促す
-		printf("\n 質問を入力 > ");
+		printf("\n 質問を入力( 終了する場合は [exit] と入力 ) > ");
 		scanf("%s", &aData[0]);
+
+		if (strcmp(&aData[0], "exit") == 0)
+		{//終了の合図が来たら
+			break;
+		}
+
+		/* それ以外の場合 */
 
 		//送信
 		send(sock, &aData[0], strlen(&aData[0]) + 1, 0);
@@ -89,9 +104,7 @@ void main(void)
 		
 		if (nRecvByte <= 0)
 		{//接続が切断されたら
-			closesocket(sock);		//ソケットのクローズ処理を行う
-
-			/* ※これ以降、送受信はできない */
+			break;
 		}
 
 		//表示
@@ -108,12 +121,16 @@ void main(void)
 	printf("\n プログラムを終了します。お疲れさまでした。");
 	PressEnter();
 
-	/* 7.接続を切断する */
+	/*
+		7.接続を切断する
+	*/
 
 	//サーバーとの接続を閉じる
 	closesocket(sock);
 
-	/* 8.Winsock終了処理 */
+	/*
+		8.Winsock終了処理
+	*/
 
 	WSACleanup();	//winsockの終了処理
 }
