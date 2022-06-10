@@ -63,7 +63,8 @@ void main(void)
 		4.Ú‘±æ‚Ì€”õ
 	*/
 
-	const char* pIPAddress = "127.0.0.1";
+	//const char* pIPAddress = "127.0.0.1";
+	const char* pIPAddress = "10.70.21.125";
 	struct sockaddr_in addr;
 	addr.sin_family = AF_INET;
 	addr.sin_port = htons(22333);
