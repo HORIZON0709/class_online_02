@@ -8,7 +8,7 @@
 //*******************************
 //インクルード
 //*******************************
-#include "main.h"
+#include "tcp_client.h"
 
 #include <stdio.h>
 #include <string.h>
@@ -20,6 +20,7 @@
 namespace
 {
 const int MAX_DATA = 256;	//データの最大数
+const char* MY_ADDRESS = "127.0.0.1";	//自分のPCにアクセスするアドレス
 }//namespaceはここまで
 
 //*******************************
@@ -35,9 +36,7 @@ void PressEnter();
 //=================================================
 void main(void)
 {
-	/*
-		2.Winsockの初期化関数を実行する
-	*/
+	/* Winsockの初期化関数を実行する */
 
 	WSADATA wsaData;
 	int nErr = WSAStartup(WINSOCK_VERSION, &wsaData);	//winsockの初期化処理
@@ -47,69 +46,43 @@ void main(void)
 		printf("\n 初期化失敗");
 	}
 
-	/*
-		3.ソケット作成
-	*/
+	CTcpClient* pTcpClient = nullptr;	//TCPクライアント
 
-	SOCKET sock;
-	sock = socket(AF_INET, SOCK_STREAM, 0);	//ソケットを作成する。接続受付用のソケット作成
-
-	if (sock == INVALID_SOCKET)
-	{//エラーメッセージを表示して終了
-		printf("\n error");
+	if (pTcpClient != nullptr)
+	{//NULLチェック
+		delete pTcpClient;		//メモリの解放
+		pTcpClient = nullptr;	//nullptrにする
 	}
 
-	/*
-		4.接続先の準備
-	*/
-
-	//const char* pIPAddress = "127.0.0.1";
-	const char* pIPAddress = "10.70.21.125";
-	struct sockaddr_in addr;
-	addr.sin_family = AF_INET;
-	addr.sin_port = htons(22333);
-	addr.sin_addr.S_un.S_addr = inet_addr(pIPAddress);
-
-	/*
-		5.接続する
-	*/
-
-	//サーバーに接続する
-	if (connect(sock, (struct sockaddr*)&addr, sizeof(addr)) != 0)
-	{//エラーメッセージを表示して終了
-		printf("\n error");
+	if (pTcpClient == nullptr)
+	{//NULLチェック
+		pTcpClient = new CTcpClient;	//メモリの動的確保
 	}
+
+	//初期化
+	pTcpClient->Init(MY_ADDRESS,22333);
 
 	while (1)
 	{
-		//入力用配列
-		char aData[MAX_DATA] = {};
+		char aSendQuestion[MAX_DATA] = {};	//質問送信用
 
-		//入力を促す
-		printf("\n 質問を入力( 終了する場合は [exit] と入力 ) > ");
-		scanf("%s", &aData[0]);
+		//送信
+		pTcpClient->Send(&aSendQuestion[0], strlen(&aSendQuestion[0]) + 1);
 
-		if (strcmp(&aData[0], "exit") == 0)
+		if (strcmp(&aSendQuestion[0], "exit") == 0)
 		{//終了の合図が来たら
 			break;
 		}
 
-		/* それ以外の場合 */
+		char aRecvAnswer[MAX_DATA] = {};	//解答受信用
 
-		//送信
-		send(sock, &aData[0], strlen(&aData[0]) + 1, 0);
+		//受信
+		int nRecvByte = pTcpClient->Recv(&aRecvAnswer[0], sizeof(aRecvAnswer));
 
-		//解答を受信
-		char aRecvAnswer[MAX_DATA] = {};
-		int nRecvByte = recv(sock, &aRecvAnswer[0], sizeof(aRecvAnswer), 0);	//データを受信する
-		
 		if (nRecvByte <= 0)
 		{//接続が切断されたら
 			break;
 		}
-
-		//表示
-		printf("\n [ %s ]", &aRecvAnswer[0]);
 
 		//Enter入力待ち
 		PressEnter();
@@ -122,18 +95,11 @@ void main(void)
 	printf("\n プログラムを終了します。お疲れさまでした。");
 	PressEnter();
 
-	/*
-		7.接続を切断する
-	*/
-
-	//サーバーとの接続を閉じる
-	closesocket(sock);
-
-	/*
-		8.Winsock終了処理
-	*/
-
-	WSACleanup();	//winsockの終了処理
+	//終了
+	pTcpClient->Uninit();
+	
+	//winsockの終了処理
+	WSACleanup();
 }
 
 namespace
