@@ -15,15 +15,6 @@
 #include <stdlib.h>
 
 //*******************************
-//定数の定義
-//*******************************
-namespace
-{
-const int MAX_DATA = 256;	//データの最大数
-const char* MY_ADDRESS = "127.0.0.1";	//自分のPCにアクセスするアドレス
-}//namespaceはここまで
-
-//*******************************
 //プロトタイプ宣言
 //*******************************
 namespace
@@ -60,24 +51,31 @@ void main(void)
 	}
 
 	//初期化
-	pTcpClient->Init(MY_ADDRESS,22333);
+	pTcpClient->Init(CTcpClient::MY_ADDRESS,22333);
 
 	while (1)
 	{
-		char aSendQuestion[MAX_DATA] = {};	//質問送信用
+		char aSendQuestion[CTcpClient::MAX_DATA] = {};	//質問送信用
 
-		//送信
-		pTcpClient->Send(&aSendQuestion[0], strlen(&aSendQuestion[0]) + 1);
+		//入力を促す
+		printf("\n 質問を入力( 終了する場合は [exit] と入力 ) > ");
+		scanf("%s", &aSendQuestion[0]);
 
 		if (strcmp(&aSendQuestion[0], "exit") == 0)
 		{//終了の合図が来たら
 			break;
 		}
 
-		char aRecvAnswer[MAX_DATA] = {};	//解答受信用
+		//送信
+		pTcpClient->Send(&aSendQuestion[0], strlen(&aSendQuestion[0]) + 1);
+
+		char aRecvAnswer[CTcpClient::MAX_DATA] = {};	//解答受信用
 
 		//受信
 		int nRecvByte = pTcpClient->Recv(&aRecvAnswer[0], sizeof(aRecvAnswer));
+
+		//表示
+		printf("\n [ %s ]", &aRecvAnswer[0]);
 
 		if (nRecvByte <= 0)
 		{//接続が切断されたら
@@ -97,6 +95,10 @@ void main(void)
 
 	//終了
 	pTcpClient->Uninit();
+
+	//メモリの解放
+	delete pTcpClient;
+	pTcpClient = nullptr;
 	
 	//winsockの終了処理
 	WSACleanup();

@@ -12,6 +12,8 @@
 
 #include <stdio.h>
 
+const char* CTcpClient::MY_ADDRESS = "127.0.0.1";	//自分のPCにアクセスするアドレス
+
 //=================================================
 //コンストラクタ
 //=================================================
@@ -66,9 +68,10 @@ bool CTcpClient::Init(const char* pIPAddress, int nPortNum)
 //=================================================
 int CTcpClient::Send(char* pSendData, int nSendData)
 {
-	//入力を促す
-	printf("\n 質問を入力( 終了する場合は [exit] と入力 ) > ");
-	scanf("%s", pSendData);
+	if (m_sock == INVALID_SOCKET)
+	{//接続済みかチェック
+		return 0;
+	}
 
 	//送信
 	return send(m_sock, pSendData, nSendData, 0);	//送信データサイズを返す
@@ -79,11 +82,18 @@ int CTcpClient::Send(char* pSendData, int nSendData)
 //=================================================
 int CTcpClient::Recv(char* pRecvData, int nRecvData)
 {
+	if (m_sock == INVALID_SOCKET)
+	{//接続済みかチェック
+		return 0;
+	}
+
 	//データを受信する
 	int nRecvByte = recv(m_sock, pRecvData, nRecvData, 0);
 
-	//表示
-	printf("\n [ %s ]", pRecvData);
+	if (nRecvByte <= 0)
+	{//接続が切断されたら
+		Uninit();	//終了
+	}
 
 	return nRecvByte;	//受信データサイズを返す
 }
@@ -93,6 +103,13 @@ int CTcpClient::Recv(char* pRecvData, int nRecvData)
 //=================================================
 void CTcpClient::Uninit()
 {
+	if (m_sock == INVALID_SOCKET)
+	{//接続済みかチェック
+		return;
+	}
+
 	//サーバーとの接続を閉じる
 	closesocket(m_sock);
+
+	m_sock = INVALID_SOCKET;	//もう使わない
 }

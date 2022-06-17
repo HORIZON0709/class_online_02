@@ -14,8 +14,9 @@
 //*******************************
 class CTcpClient
 {/* 基本クラス */
-private: /* 定数の定義 */
+public: /* 定数の定義 */
 	static const int MAX_DATA = 256;	//データの最大数
+	static const char* MY_ADDRESS;		//自分のPCにアクセスするアドレス
 
 public: /* コンストラクタ・デストラクタ */
 	CTcpClient();
