@@ -24,6 +24,7 @@ public: /* コンストラクタ・デストラクタ */
 
 public: /* メンバ関数 */
 	bool Init(const char* pIPAddress, int nPortNum);	//初期化
+	bool Init(SOCKET sock);								//初期化(サーバー用)
 	int Send(char* pSendData, int nSendData);			//送信
 	int Recv(char* pRecvData, int nRecvData);			//受信
 	void Uninit();										//終了

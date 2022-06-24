@@ -93,13 +93,13 @@ void main(void)
 	printf("\n プログラムを終了します。お疲れさまでした。");
 	PressEnter();
 
-	//終了
-	pTcpClient->Uninit();
+	if (pTcpClient != nullptr)
+	{//NULLチェック
+		pTcpClient->Uninit();	//終了
+		delete pTcpClient;		//メモリの解放
+		pTcpClient = nullptr;	//nullptrにする
+	}
 
-	//メモリの解放
-	delete pTcpClient;
-	pTcpClient = nullptr;
-	
 	//winsockの終了処理
 	WSACleanup();
 }

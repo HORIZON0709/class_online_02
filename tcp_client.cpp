@@ -64,6 +64,16 @@ bool CTcpClient::Init(const char* pIPAddress, int nPortNum)
 }
 
 //=================================================
+//‰Šú‰»
+//=================================================
+bool CTcpClient::Init(SOCKET sock)
+{
+	m_sock = sock;
+
+	return true;
+}
+
+//=================================================
 //‘—M
 //=================================================
 int CTcpClient::Send(char* pSendData, int nSendData)
